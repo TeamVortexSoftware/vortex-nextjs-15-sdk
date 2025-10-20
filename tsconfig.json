@@ -1,0 +1,14 @@
+{
+  "extends": "@teamvortexsoftware/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "src",
+    "types": ["jest", "node"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
