@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 export interface AuthenticatedUser {
   userId: string;
   identifiers: { type: 'email' | 'sms'; value: string }[];
-  groups: { type: string; id: string; name: string }[];
+  groups: { type: string; id?: string; groupId?: string; name: string }[];
   role?: string;
   attributes?: Record<string, any>;
 }
