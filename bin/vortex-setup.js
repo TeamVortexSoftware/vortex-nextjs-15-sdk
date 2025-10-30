@@ -12,43 +12,47 @@ const VORTEX_ROUTES = [
   'invitations/[invitationId]/reinvite/route.ts'
 ];
 
-const ROUTE_TEMPLATES = {
-  'jwt/route.ts': `import 'lib/vortex-config';
+function createRouteTemplates(baseDir) {
+  const configImport = baseDir ? '@/lib/vortex-config' : '@/lib/vortex-config';
+
+  return {
+    'jwt/route.ts': `import '${configImport}';
 import { createVortexRoutes } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export const { POST } = createVortexRoutes().jwt;
 `,
 
-  'invitations/route.ts': `import 'lib/vortex-config';
+    'invitations/route.ts': `import '${configImport}';
 import { createVortexRoutes } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export const { GET } = createVortexRoutes().invitations;
 `,
 
-  'invitations/[invitationId]/route.ts': `import 'lib/vortex-config';
+    'invitations/[invitationId]/route.ts': `import '${configImport}';
 import { createVortexRoutes } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export const { GET, DELETE } = createVortexRoutes().invitation;
 `,
 
-  'invitations/accept/route.ts': `import 'lib/vortex-config';
+    'invitations/accept/route.ts': `import '${configImport}';
 import { createVortexRoutes } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export const { POST } = createVortexRoutes().invitationsAccept;
 `,
 
-  'invitations/by-group/[groupType]/[groupId]/route.ts': `import 'lib/vortex-config';
+    'invitations/by-group/[groupType]/[groupId]/route.ts': `import '${configImport}';
 import { createVortexRoutes } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export const { GET, DELETE } = createVortexRoutes().invitationsByGroup;
 `,
 
-  'invitations/[invitationId]/reinvite/route.ts': `import 'lib/vortex-config';
+    'invitations/[invitationId]/reinvite/route.ts': `import '${configImport}';
 import { createVortexRoutes } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export const { POST } = createVortexRoutes().invitationReinvite;
 `
-};
+  };
+}
 
 const CONFIG_TEMPLATE = `import {
   configureVortexLazy,
@@ -124,17 +128,26 @@ function main() {
     process.exit(1);
   }
 
-  // Check for app directory
-  if (!fs.existsSync('app')) {
-    console.error('❌ This setup requires Next.js App Router. Please ensure you have an "app" directory.');
+  // Check for app directory - support both root app/ and src/app/
+  let baseDir = '';
+  if (fs.existsSync('app')) {
+    baseDir = '';
+    console.log('✓ Found app directory at project root');
+  } else if (fs.existsSync('src/app')) {
+    baseDir = 'src';
+    console.log('✓ Found app directory in src/');
+  } else {
+    console.error('❌ This setup requires Next.js App Router. Please ensure you have an "app" or "src/app" directory.');
     process.exit(1);
   }
 
   let filesCreated = 0;
 
   // Create API routes
-  const apiDir = path.join('app', 'api', 'vortex');
+  const apiDir = path.join(baseDir, 'app', 'api', 'vortex');
   createDirectory(apiDir);
+
+  const routeTemplates = createRouteTemplates(baseDir);
 
   VORTEX_ROUTES.forEach(route => {
     const filePath = path.join(apiDir, route);
@@ -142,14 +155,15 @@ function main() {
 
     createDirectory(dirPath);
 
-    if (writeFileIfNotExists(filePath, ROUTE_TEMPLATES[route])) {
+    if (writeFileIfNotExists(filePath, routeTemplates[route])) {
       filesCreated++;
     }
   });
 
   // Create lib directory and config file
-  createDirectory('lib');
-  const configPath = path.join('lib', 'vortex-config.ts');
+  const libDir = baseDir ? path.join(baseDir, 'lib') : 'lib';
+  createDirectory(libDir);
+  const configPath = path.join(libDir, 'vortex-config.ts');
 
   if (writeFileIfNotExists(configPath, CONFIG_TEMPLATE)) {
     filesCreated++;
@@ -159,9 +173,14 @@ function main() {
   console.log('\n📋 Next steps:');
   console.log('1. Add your VORTEX_API_KEY to .env.local:');
   console.log('   VORTEX_API_KEY=your_api_key_here');
-  console.log('2. Import the config in your app/layout.tsx:');
-  console.log('   import \'../lib/vortex-config\';');
-  console.log('3. Implement the authenticateUser function in lib/vortex-config.ts');
+
+  const layoutPath = baseDir ? `${baseDir}/app/layout.tsx` : 'app/layout.tsx';
+  const configImportPath = baseDir ? '../lib/vortex-config' : '../lib/vortex-config';
+  const configFilePath = baseDir ? `${baseDir}/lib/vortex-config.ts` : 'lib/vortex-config.ts';
+
+  console.log(`2. Import the config in your ${layoutPath}:`);
+  console.log(`   import '${configImportPath}';`);
+  console.log(`3. Implement the authenticateUser function in ${configFilePath}`);
   console.log('4. Wrap your app in VortexProvider:');
   console.log('   <VortexProvider config={{ apiBaseUrl: \'/api/vortex\' }}>');
 

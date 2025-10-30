@@ -38,7 +38,7 @@ lib/
 
 Each route file is just 3 lines:
 ```typescript
-import 'lib/vortex-config';
+import '@/lib/vortex-config';
 import { createVortexRoutes } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export const { GET, DELETE } = createVortexRoutes().invitation;
@@ -170,7 +170,7 @@ Need custom logic? Create your own routes:
 
 ```typescript
 // app/api/custom-invitation/route.ts
-import 'lib/vortex-config';
+import '@/lib/vortex-config';
 import { handleGetInvitation, createErrorResponse } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export async function GET(request: NextRequest) {
@@ -189,7 +189,7 @@ export async function GET(request: NextRequest) {
 
 ### Build Errors
 If you see configuration errors during build:
-- Make sure you're importing `'lib/vortex-config'` in your layout
+- Make sure you're importing `'@/lib/vortex-config'` (or `'../lib/vortex-config'`) in your layout
 - Check that your `.env.local` has `VORTEX_API_KEY`
 - Ensure you're using lazy initialization (`configureVortexLazy`)
 
