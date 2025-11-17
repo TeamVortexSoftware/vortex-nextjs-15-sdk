@@ -73,23 +73,48 @@ export default function RootLayout({ children }) {
 ### 3. Customize Configuration
 Edit `lib/vortex-config.ts` to implement your authentication and access control:
 
+#### New Format (Recommended)
+
 ```typescript
 import { configureVortexLazy, createAllowAllAccessControl } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 configureVortexLazy(async () => ({
   apiKey: process.env.VORTEX_API_KEY!,
 
-  // Required: How to authenticate users
+  // Required: How to authenticate users (new format)
   authenticateUser: async (request) => {
     const user = await getCurrentUser(request); // Your auth logic
     return user ? {
       userId: user.id,
-      identifiers: [{ type: 'email', value: user.email }],
-      groups: user.groups, // [{ type: 'team', groupId: '123', name: 'My Team' }]
+      userEmail: user.email,
+      adminScopes: user.isAdmin ? ['autoJoin'] : [], // Optional: grant admin capabilities
     } : null;
   },
 
   // Simple: Allow all operations (customize for production)
+  ...createAllowAllAccessControl(),
+}));
+```
+
+#### Legacy Format (Deprecated)
+
+The legacy format is still supported for backward compatibility:
+
+```typescript
+configureVortexLazy(async () => ({
+  apiKey: process.env.VORTEX_API_KEY!,
+
+  // Legacy format (deprecated)
+  authenticateUser: async (request) => {
+    const user = await getCurrentUser(request);
+    return user ? {
+      userId: user.id,
+      identifiers: [{ type: 'email', value: user.email }],
+      groups: user.groups, // [{ type: 'team', groupId: '123', name: 'My Team' }]
+      role: user.role,
+    } : null;
+  },
+
   ...createAllowAllAccessControl(),
 }));
 ```

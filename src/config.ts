@@ -2,8 +2,11 @@ import { NextRequest } from 'next/server';
 
 export interface AuthenticatedUser {
   userId: string;
-  identifiers: { type: 'email' | 'sms'; value: string }[];
-  groups: { type: string; id?: string; groupId?: string; name: string }[];
+  userEmail?: string;
+  adminScopes?: string[];
+  // Legacy fields (deprecated but still supported for backward compatibility)
+  identifiers?: { type: 'email' | 'sms'; value: string }[];
+  groups?: { type: string; id?: string; groupId?: string; name: string }[];
   role?: string;
   attributes?: Record<string, any>;
 }
@@ -38,9 +41,9 @@ export interface GroupAccessHook extends AccessControlHook<GroupResource> {}
 export interface BasicAccessHook extends AccessControlHook<void> {}
 
 export interface JwtContext {
-  widgetId?: string;
-  groupId?: string;
-  groupType?: string;
+  componentId?: string;
+  scope?: string;
+  scopeType?: string;
 }
 
 export interface VortexConfig {
