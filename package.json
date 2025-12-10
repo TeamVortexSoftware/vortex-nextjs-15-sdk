@@ -30,7 +30,7 @@
     "check-types": "tsc --noEmit",
     "distclean": "rm -rf ./dist ./dist.d",
     "clean": "rm -rf ./dist",
-    "dev": "",
+    "dev": "tsc -b tsconfig.json --watch",
     "test": "jest",
     "package": "pnpm run build && cd dist/vortex-nextjs-15-sdk && npm pack",
     "build": "tsc -b tsconfig.json"
@@ -52,12 +52,11 @@
     "@jest/globals": "29.7.0",
     "@teamvortexsoftware/eslint-config": "workspace:*",
     "@teamvortexsoftware/typescript-config": "workspace:*",
-    "@types/node": "^20.0.0",
+    "@types/node": "catalog:",
     "eslint": "catalog:",
     "jest": "29.7.0",
     "next": "^15.5.7",
     "ts-jest": "catalog:",
-    "typescript": "^5.0.0",
     "typescript-eslint": "catalog:"
   },
   "dependencies": {

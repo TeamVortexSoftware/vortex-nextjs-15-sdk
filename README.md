@@ -39,8 +39,8 @@ lib/
 Each route file is just 3 lines:
 
 ```typescript
-import "@/lib/vortex-config";
-import { createVortexRoutes } from "@teamvortexsoftware/vortex-nextjs-15-sdk";
+import '@/lib/vortex-config';
+import { createVortexRoutes } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export const { GET, DELETE } = createVortexRoutes().invitation;
 ```
@@ -85,7 +85,7 @@ Edit `lib/vortex-config.ts` to implement your authentication and access control:
 import {
   configureVortexLazy,
   createAllowAllAccessControl,
-} from "@teamvortexsoftware/vortex-nextjs-15-sdk";
+} from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 configureVortexLazy(async () => ({
   apiKey: process.env.VORTEX_API_KEY!,
@@ -97,7 +97,7 @@ configureVortexLazy(async () => ({
       ? {
           userId: user.id,
           userEmail: user.email,
-          adminScopes: user.isAdmin ? ["autoJoin"] : [], // Optional: grant admin capabilities
+          adminScopes: user.isAdmin ? ['autojoin'] : [], // Optional: grant admin capabilities
         }
       : null;
   },
@@ -121,7 +121,7 @@ configureVortexLazy(async () => ({
     return user
       ? {
           userId: user.id,
-          identifiers: [{ type: "email", value: user.email }],
+          identifiers: [{ type: 'email', value: user.email }],
           groups: user.groups, // [{ type: 'team', groupId: '123', name: 'My Team' }]
           role: user.role,
         }
@@ -145,12 +145,12 @@ configureVortexLazy(async () => ({
 
   // Custom access control
   canDeleteInvitation: async (request, user, resource) => {
-    return user?.role === "admin"; // Only admins can delete
+    return user?.role === 'admin'; // Only admins can delete
   },
 
   canAccessInvitationsByGroup: async (request, user, resource) => {
     return user?.groups.some(
-      (g) => g.type === resource?.groupType && g.groupId === resource?.groupId,
+      (g) => g.type === resource?.groupType && g.groupId === resource?.groupId
     );
   },
 
@@ -191,22 +191,20 @@ function MyComponent() {
 ### Frontend: Manage Invitations
 
 ```typescript
-const { data: invitations } = useFetch(
-  "/api/vortex/invitations/by-group/team/my-team-id",
-);
+const { data: invitations } = useFetch('/api/vortex/invitations/by-group/team/my-team-id');
 
 // Delete invitation
-await fetch(`/api/vortex/invitations/${invitationId}`, { method: "DELETE" });
+await fetch(`/api/vortex/invitations/${invitationId}`, { method: 'DELETE' });
 ```
 
 ### Backend: Direct SDK Usage
 
 ```typescript
-import { Vortex } from "@teamvortexsoftware/vortex-nextjs-15-sdk";
+import { Vortex } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 // All Node.js SDK functionality is available
 const vortex = new Vortex(process.env.VORTEX_API_KEY!);
-const invitations = await vortex.getInvitationsByGroup("team", "team-123");
+const invitations = await vortex.getInvitationsByGroup('team', 'team-123');
 ```
 
 ## 🛠️ Advanced: Custom Routes
@@ -215,21 +213,18 @@ Need custom logic? Create your own routes:
 
 ```typescript
 // app/api/custom-invitation/route.ts
-import "@/lib/vortex-config";
-import {
-  handleGetInvitation,
-  createErrorResponse,
-} from "@teamvortexsoftware/vortex-nextjs-15-sdk";
+import '@/lib/vortex-config';
+import { handleGetInvitation, createErrorResponse } from '@teamvortexsoftware/vortex-nextjs-15-sdk';
 
 export async function GET(request: NextRequest) {
   // Add custom validation
   const user = await validateUser(request);
   if (!user.isAdmin) {
-    return createErrorResponse("Admin required", 403);
+    return createErrorResponse('Admin required', 403);
   }
 
   // Use SDK handler
-  return handleGetInvitation(request, "invitation-id");
+  return handleGetInvitation(request, 'invitation-id');
 }
 ```
 

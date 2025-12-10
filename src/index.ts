@@ -1,4 +1,11 @@
-export { configureVortex, configureVortexAsync, configureVortexLazy, getVortexConfig, authenticateRequest, createAllowAllAccessControl } from './config';
+export {
+  configureVortex,
+  configureVortexAsync,
+  configureVortexLazy,
+  getVortexConfig,
+  authenticateRequest,
+  createAllowAllAccessControl,
+} from './config';
 export type {
   VortexConfig,
   AuthenticatedUser,
@@ -26,9 +33,7 @@ export {
   createVortexApiPath,
 } from './routes';
 
-export {
-  handleJwtGeneration,
-} from './handlers/jwt';
+export { handleJwtGeneration } from './handlers/jwt';
 
 export {
   handleGetInvitationsByTarget,
@@ -48,5 +53,8 @@ export {
   validateRequiredFields,
   sanitizeInput,
 } from './utils';
+
+// Server Actions for admin operations (autojoin)
+export { getAutojoinDomains, configureAutojoin } from './actions/autojoin';
 
 export * from '@teamvortexsoftware/vortex-node-22-sdk';
