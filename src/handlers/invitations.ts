@@ -117,9 +117,8 @@ export async function handleAcceptInvitations(request: NextRequest) {
     }
 
     const body = await parseRequestBody(request);
-    validateRequiredFields(body, ['invitationIds', 'target']);
 
-    const { invitationIds, target } = body;
+    const { invitationIds, target, user } = body;
 
     if (!Array.isArray(invitationIds) || invitationIds.length === 0) {
       return createErrorResponse('invitationIds must be a non-empty array', 400);
@@ -131,31 +130,53 @@ export async function handleAcceptInvitations(request: NextRequest) {
       return createErrorResponse('Invalid invitation IDs provided', 400);
     }
 
-    if (!target.type || !target.value) {
-      return createErrorResponse('target must have type and value properties', 400);
+    // Support both new format (user) and legacy format (target)
+    if (!user && !target) {
+      return createErrorResponse('Either user or target must be provided', 400);
     }
 
-    if (!['email', 'username', 'phoneNumber'].includes(target.type)) {
-      return createErrorResponse('target.type must be email, username, or phoneNumber', 400);
+    let acceptData: any;
+
+    if (user) {
+      // New format: user object with email/phone
+      if (!user.email && !user.phone) {
+        return createErrorResponse('user must have either email or phone', 400);
+      }
+      acceptData = {
+        email: user.email ? sanitizeInput(user.email) : undefined,
+        phone: user.phone ? sanitizeInput(user.phone) : undefined,
+        name: user.name ? sanitizeInput(user.name) : undefined,
+      };
+    } else {
+      // Legacy format: target object
+      if (!target.type || !target.value) {
+        return createErrorResponse('target must have type and value properties', 400);
+      }
+
+      if (!['email', 'username', 'phoneNumber', 'sms'].includes(target.type)) {
+        return createErrorResponse('target.type must be email, username, phoneNumber, or sms', 400);
+      }
+
+      acceptData = {
+        type: target.type,
+        value: sanitizeInput(target.value) || target.value
+      };
     }
 
     const config = await getVortexConfig(request);
-    const user = await authenticateRequest(request);
+    const authenticatedUser = await authenticateRequest(request);
 
     if (config.canAcceptInvitations) {
-      const hasAccess = await config.canAcceptInvitations(request, user, { invitationIds: sanitizedIds, target });
+      const hasAccess = await config.canAcceptInvitations(request, authenticatedUser, { invitationIds: sanitizedIds, target, user });
       if (!hasAccess) {
         return createErrorResponse('Access denied', 403);
       }
-    } else if (!user) {
+    } else if (!authenticatedUser) {
       return createErrorResponse('Access denied. Configure access control hooks for invitation endpoints.', 403);
     }
 
     const vortex = new Vortex(config.apiKey);
-    const result = await vortex.acceptInvitations(sanitizedIds, {
-      type: target.type,
-      value: sanitizeInput(target.value) || target.value
-    });
+    const result = await vortex.acceptInvitations(sanitizedIds, acceptData);
     return createApiResponse(result);
   } catch (error) {
     console.error('Error in handleAcceptInvitations:', error);

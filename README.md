@@ -263,9 +263,9 @@ This SDK re-exports everything from `@teamvortexsoftware/vortex-node-22-sdk`, so
 ## 🔗 Links
 
 - [Node.js SDK Documentation](../vortex-node-22-sdk/README.md)
-- [React Provider Documentation](../vortex-react-provider/README.md)
-- [Example Implementation](../../apps/demo-react)
+- [React Provider Documentation](../../packages/vortex-react-provider/README.md)
+- [Example Implementation](../../apps/acmetasks)
 
 ---
 
-**Need help?** Open an issue or check the example implementation in `apps/demo-react`
+**Need help?** Open an issue or check the example implementation in `apps/acmetasks`
