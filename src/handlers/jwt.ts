@@ -66,6 +66,8 @@ export async function handleJwtGeneration(request: NextRequest) {
       user: {
         id: authenticatedUser.userId,
         email: authenticatedUser.userEmail,
+        ...(authenticatedUser.name && { name: authenticatedUser.name }),
+        ...(authenticatedUser.avatarUrl && { avatarUrl: authenticatedUser.avatarUrl }),
         ...(authenticatedUser.adminScopes && authenticatedUser.adminScopes.length > 0 && {
           adminScopes: authenticatedUser.adminScopes
         }),

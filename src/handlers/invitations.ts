@@ -153,8 +153,8 @@ export async function handleAcceptInvitations(request: NextRequest) {
         return createErrorResponse('target must have type and value properties', 400);
       }
 
-      if (!['email', 'username', 'phoneNumber', 'sms'].includes(target.type)) {
-        return createErrorResponse('target.type must be email, username, phoneNumber, or sms', 400);
+      if (!['email', 'username', 'phoneNumber', 'phone'].includes(target.type)) {
+        return createErrorResponse('target.type must be email, username, phoneNumber, or phone', 400);
       }
 
       acceptData = {
