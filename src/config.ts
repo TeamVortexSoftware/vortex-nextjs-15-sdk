@@ -3,8 +3,8 @@ import { NextRequest } from 'next/server';
 export interface AuthenticatedUser {
   userId: string;
   userEmail?: string;
-  name?: string;
-  avatarUrl?: string;
+  userName?: string;
+  userAvatarUrl?: string;
   adminScopes?: string[];
   // Legacy fields (deprecated but still supported for backward compatibility)
   identifiers?: { type: 'email' | 'phone'; value: string }[];
